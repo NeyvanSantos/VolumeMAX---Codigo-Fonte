@@ -1,0 +1,67 @@
+{
+  "name": "volumemax",
+  "version": "2.0.0",
+  "description": "Amplificador de Volume para Windows — Boost acima de 100%",
+  "main": "electron/main.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "electron:dev": "concurrently -k \"vite --port 5173\" \"wait-on http://localhost:5173 && cross-env VITE_DEV_SERVER_URL=http://localhost:5173 electron .\"",
+    "electron:build": "vite build && electron-builder",
+    "electron:start": "electron ."
+  },
+  "keywords": [
+    "volume",
+    "booster",
+    "audio",
+    "amplifier",
+    "windows"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "@vitejs/plugin-react": "^4.0.0",
+    "concurrently": "^8.2.2",
+    "cross-env": "^7.0.3",
+    "electron": "^28.0.0",
+    "electron-builder": "^24.13.3",
+    "typescript": "^5.0.0",
+    "vite": "^5.0.0",
+    "wait-on": "^7.2.0"
+  },
+  "dependencies": {
+    "lucide-react": "^1.49.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "build": {
+    "appId": "com.volumemax.app",
+    "productName": "VolumeMax",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "assets/**/*",
+      "installer/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ],
+      "icon": "assets/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": false,
+      "include": "installer/customInstaller.nsh"
+    }
+  }
+}

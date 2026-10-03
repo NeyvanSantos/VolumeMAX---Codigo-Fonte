@@ -1,0 +1,15 @@
+TERMOS DE USO E LICENÇA - VOLUMEMAX
+
+1. FINALIDADE E FUNCIONAMENTO:
+O VolumeMax é uma ferramenta avançada de aprimoramento, gerenciamento de sessões e amplificação de áudio no sistema operacional Windows. Ele oferece controle nativo de 0% a 100% sobre o volume mestre e amplificação estendida de 101% a 500%.
+
+2. MOTOR DE AMPLIFICAÇÃO (EQUALIZER APO):
+Para permitir que o volume ultrapasse os 100% com alta fidelidade e sem latência, o VolumeMax opera diretamente integrado com o Equalizer APO, um processador de sinal de áudio (Audio Processing Object) de código aberto que se conecta ao driver de som do Windows.
+
+3. RESPONSABILIDADE DO USUÁRIO E SAÚDE AUDITIVA:
+O usuário reconhece que volumes extremamente elevados (acima de 100% até 500%) podem causar fadiga auditiva ou riscos à saúde caso utilizados de forma prolongada, especialmente com o uso de fones de ouvido. Recomenda-se elevar o nível de ganho gradualmente e com moderação.
+
+4. LIMITAÇÃO DE RESPONSABILIDADE:
+O software é fornecido gratuitamente "como está", sem garantias expressas ou implícitas de qualquer natureza. Em nenhuma hipótese os desenvolvedores serão responsabilizados por eventuais danos em equipamentos de reprodução decorrentes de sobrecarga.
+
+Ao prosseguir com a instalação e selecionar a opção recomendada abaixo, você concorda com estes termos.
