@@ -38,8 +38,72 @@ function run(cmd, env = {}) {
   });
 }
 
+/**
+ * Gera automaticamente o changelog com base no histórico recente de commits do Git.
+ */
+function generateChangelog() {
+  try {
+    const tags = execSync('git tag --sort=-creatordate', { encoding: 'utf-8' })
+      .split('\n')
+      .map((t) => t.trim())
+      .filter(Boolean);
+
+    let logCmd = 'git log -n 12 --pretty=format:"%s"';
+    if (tags.length > 1) {
+      const prevTag = tags[1];
+      logCmd = `git log ${prevTag}..HEAD --pretty=format:"%s"`;
+    }
+
+    const commits = execSync(logCmd, { encoding: 'utf-8' })
+      .split('\n')
+      .map((c) => c.trim())
+      .filter(Boolean);
+
+    if (commits.length === 0) return '';
+
+    const feats = [];
+    const fixes = [];
+    const docs = [];
+    const others = [];
+
+    for (const msg of commits) {
+      if (/^feat(\([^)]+\))?:\s*/i.test(msg)) {
+        feats.push(msg.replace(/^feat(\([^)]+\))?:\s*/i, ''));
+      } else if (/^fix(\([^)]+\))?:\s*/i.test(msg)) {
+        fixes.push(msg.replace(/^fix(\([^)]+\))?:\s*/i, ''));
+      } else if (/^docs(\([^)]+\))?:\s*/i.test(msg)) {
+        docs.push(msg.replace(/^docs(\([^)]+\))?:\s*/i, ''));
+      } else {
+        others.push(msg);
+      }
+    }
+
+    let notes = '';
+    if (feats.length > 0) {
+      notes += '### 🚀 Novidades e Novos Recursos\n';
+      notes += feats.map((f) => `- ${f}`).join('\n') + '\n\n';
+    }
+    if (fixes.length > 0) {
+      notes += '### 🐛 Correções e Melhorias\n';
+      notes += fixes.map((f) => `- ${f}`).join('\n') + '\n\n';
+    }
+    if (docs.length > 0) {
+      notes += '### 📚 Documentação e Regras\n';
+      notes += docs.map((d) => `- ${d}`).join('\n') + '\n\n';
+    }
+    if (others.length > 0 && feats.length === 0 && fixes.length === 0) {
+      notes += '### 📝 Alterações nesta Versão\n';
+      notes += others.map((o) => `- ${o}`).join('\n') + '\n\n';
+    }
+
+    return notes;
+  } catch {
+    return '';
+  }
+}
+
 function main() {
-  console.log('\n🚀 [VolumeMax] Iniciando Publicação de Release no GitHub...\n');
+  console.log('\n🚀 [VolumeMax] Publicador de Releases no GitHub com Changelog...\n');
 
   // 1. Ler package.json
   const pkg = JSON.parse(fs.readFileSync(PACKAGE_PATH, 'utf-8'));
@@ -84,9 +148,36 @@ function main() {
 
   const tag = `v${version}`;
   const title = `VolumeMax v${version}`;
-  const notes = `### VolumeMax ${tag}\n\n- Motor de Áudio nativo Equalizer APO (Preamp até 500%)\n- Zero drivers virtuais intrusivos (Zero FxSound)\n- Controle individual de volume por aplicativo (WASAPI)\n- Atualizações automáticas integradas via GitHub Releases\n\n**Para instalar:** Baixe e execute \`VolumeMax Setup ${version}.exe\`.`;
 
-  // 4. Criação da Tag Git
+  // 4. Montar Changelog / O que foi alterado
+  console.log('📋 Coletando lista de alterações (Changelog)...');
+  const dynamicChangelog = generateChangelog();
+
+  // Permite notas personalizadas via argumento: --notes "..."
+  const notesIndex = process.argv.indexOf('--notes');
+  const customNotes = notesIndex !== -1 && process.argv[notesIndex + 1] ? process.argv[notesIndex + 1] : null;
+
+  let releaseBody = `## VolumeMax ${tag}\n\n`;
+
+  if (customNotes) {
+    releaseBody += `### 📌 Destaques desta Versão:\n${customNotes}\n\n`;
+  } else if (dynamicChangelog) {
+    releaseBody += dynamicChangelog;
+  } else {
+    releaseBody += `### 🚀 Destaques:\n- Atualizações de desempenho e estabilidade do amplificador de áudio.\n\n`;
+  }
+
+  releaseBody += `### 📦 Como Instalar / Atualizar:\n`;
+  releaseBody += `1. Baixe o instalador oficial: **\`VolumeMax Setup ${version}.exe\`** abaixo.\n`;
+  releaseBody += `2. Execute a instalação. O instalador detectará e configurará o Equalizer APO nativamente se necessário.\n`;
+  releaseBody += `3. Caso já utilize o aplicativo, o sistema de auto-atualização pode ser acionado diretamente pelo botão **Atualizar Agora** na interface.\n\n`;
+  releaseBody += `---\n*VolumeMax — Ganho nativo de até 500% integrado ao driver de áudio do Windows (Zero FxSound).*`;
+
+  // Salva temporariamente para evitar falhas de escape de aspas no shell do Windows
+  const notesFile = path.join(RELEASE_DIR, 'release-notes-temp.md');
+  fs.writeFileSync(notesFile, releaseBody, 'utf-8');
+
+  // 5. Criação da Tag Git
   console.log(`🏷️  Criando e sincronizando tag ${tag}...`);
   try {
     run(`git tag -a ${tag} -m "${title}"`);
@@ -100,8 +191,8 @@ function main() {
     console.log(`Tag ${tag} já está sincronizada no remoto.`);
   }
 
-  // 5. Publicação no GitHub Releases via GitHub CLI
-  console.log(`🌐 Publicando Release ${tag} no GitHub com o instalador anexado...`);
+  // 6. Publicação no GitHub Releases via GitHub CLI com o Changelog
+  console.log(`🌐 Publicando Release ${tag} no GitHub com notas e instalador anexado...`);
 
   const filesToUpload = [`"${setupExe}"`];
   if (fs.existsSync(portableExe)) {
@@ -109,20 +200,29 @@ function main() {
   }
 
   try {
-    // Tenta criar release
+    // Tenta criar release com arquivo de notas
     run(
-      `gh release create ${tag} ${filesToUpload.join(' ')} --title "${title}" --notes "${notes.replace(/"/g, '\\"')}"`,
+      `gh release create ${tag} ${filesToUpload.join(' ')} --title "${title}" --notes-file "${notesFile}"`,
       { GH_TOKEN: token }
     );
   } catch {
-    console.log('⚠️ Release já existente detectada. Atualizando arquivos anexados...');
+    console.log('⚠️ Release já existente detectada. Atualizando notas e arquivos anexados...');
+    run(
+      `gh release edit ${tag} --title "${title}" --notes-file "${notesFile}"`,
+      { GH_TOKEN: token }
+    );
     run(
       `gh release upload ${tag} ${filesToUpload.join(' ')} --clobber`,
       { GH_TOKEN: token }
     );
   }
 
-  console.log('\n🎉 RELEASE PUBLICADA COM SUCESSO NO GITHUB!');
+  // Remove arquivo temporário de notas
+  try {
+    fs.unlinkSync(notesFile);
+  } catch {}
+
+  console.log('\n🎉 RELEASE PUBLICADA COM SUCESSO NO GITHUB COM CHANGELOG!');
   console.log(`🔗 Ver em: https://github.com/NeyvanSantos/VolumeMAX---Codigo-Fonte/releases/tag/${tag}\n`);
 }
 
