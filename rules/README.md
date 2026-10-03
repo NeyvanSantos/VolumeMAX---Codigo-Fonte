@@ -12,6 +12,7 @@ Qualquer desenvolvedor ou assistente de IA que atue neste repositório **DEVE** 
 3. [Padrões de Código e Estrutura de Pastas](code-standards.md) — Organização estrita de diretórios e padrões TypeScript/Electron.
 4. [Comunicação e Políticas de Build](communication-and-delivery.md) — Idioma PT-BR e política de geração de executáveis.
 5. [Organização Contínua e Integridade](clean-architecture-and-organization.md) — Obrigação de manter as pastas organizadas e notificar ao final.
+6. [Sincronização com GitHub](git-workflow.md) — Obrigação de commit e envio (`push`) a cada alteração finalizada.
 
 ---
 

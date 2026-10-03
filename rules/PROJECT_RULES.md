@@ -40,3 +40,8 @@ Este documento consolida as regras fundamentais do projeto **VolumeMax**. Ele go
 ### 5. Organização Contínua e Aviso Obrigatório
 * **Integridade das Pastas:** Sempre ao final de cada comando ou alteração, é obrigatório deixar o projeto sólido, com cada arquivo em sua devida pasta, sem misturar responsabilidades e mantendo o fluxo liso.
 * **Aviso Obrigatório:** Sempre notificar expressamente ao final da resposta que a organização das pastas foi conferida e mantida sólida.
+
+---
+
+### 6. Sincronização Obrigatória com o GitHub
+* **Envio Contínuo:** Sempre ao final de cada comando ou alteração concluída, é obrigatório realizar o commit e o envio (`git push origin main`) para o repositório remoto no GitHub (`NeyvanSantos/VolumeMAX---Codigo-Fonte`), mantendo a paridade absoluta entre a máquina local e o repositório.
