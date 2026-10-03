@@ -1,6 +1,6 @@
 {
   "name": "volumemax",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Amplificador de Volume para Windows — Boost acima de 100%",
   "main": "electron/main.js",
   "scripts": {

@@ -46,3 +46,8 @@ Este documento consolida as regras fundamentais do projeto **VolumeMax**. Ele go
 
 ### 6. Sincronização Obrigatória com o GitHub
 * **Envio Contínuo:** Sempre ao final de cada comando ou alteração concluída, é obrigatório realizar o commit e o envio (`git push origin main`) para o repositório remoto no GitHub (`NeyvanSantos/VolumeMAX---Codigo-Fonte`), mantendo a paridade absoluta entre a máquina local e o repositório.
+
+---
+
+### 7. Incremento Obrigatório de Versão
+* **Version Bump:** Sempre após cada alteração, recurso implementado ou correção, é obrigatório incrementar o número da versão (`package.json`, ex: `2.0.1` -> `2.0.2`), garantindo que o sistema de atualização automática do app reconheça a nova versão e informe os usuários instantaneamente.
