@@ -37,4 +37,18 @@ contextBridge.exposeInMainWorld('volumemax', {
     ipcRenderer.on('audio-meter', handler);
     return () => ipcRenderer.removeListener('audio-meter', handler);
   },
+
+  // Auto-Update
+  checkForUpdates: () => ipcRenderer.invoke('check-for-updates'),
+  downloadAndInstallUpdate: (updateInfo) => ipcRenderer.invoke('download-and-install-update', updateInfo),
+  onUpdateAvailable: (callback) => {
+    const handler = (_, info) => callback(info);
+    ipcRenderer.on('update-available', handler);
+    return () => ipcRenderer.removeListener('update-available', handler);
+  },
+  onUpdateDownloadProgress: (callback) => {
+    const handler = (_, percent) => callback(percent);
+    ipcRenderer.on('update-download-progress', handler);
+    return () => ipcRenderer.removeListener('update-download-progress', handler);
+  },
 });

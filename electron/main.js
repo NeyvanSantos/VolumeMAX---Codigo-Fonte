@@ -2,6 +2,7 @@ const { app, BrowserWindow, Tray, Menu, screen, globalShortcut, ipcMain, nativeI
 const path = require('path');
 const fs = require('fs');
 const { exec, execFile } = require('child_process');
+const { checkForUpdates, downloadUpdate } = require('./updater');
 
 let mainWindow = null;
 let tray = null;
@@ -332,6 +333,38 @@ ipcMain.on('close-window', () => {
   mainWindow?.hide();
 });
 
+// ── Auto-Update IPC Handlers ─────────────────────────────────────────────
+
+ipcMain.handle('check-for-updates', async () => {
+  const currentVersion = app.getVersion();
+  const update = await checkForUpdates(currentVersion);
+  return update; // null se já está na última versão
+});
+
+ipcMain.handle('download-and-install-update', async (_, updateInfo) => {
+  const tempDir = app.getPath('temp');
+  const destPath = path.join(tempDir, updateInfo.fileName);
+
+  try {
+    await downloadUpdate(updateInfo.downloadUrl, destPath, (percent) => {
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.send('update-download-progress', percent);
+      }
+    });
+
+    // Lança o instalador e encerra o VolumeMax para permitir a atualização
+    exec(`"${destPath}"`, { detached: true });
+    setTimeout(() => {
+      app.isQuitting = true;
+      app.quit();
+    }, 1500);
+
+    return { success: true };
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
+});
+
 // App lifecycle
 app.whenReady().then(async () => {
   createWindow();
@@ -348,6 +381,16 @@ app.whenReady().then(async () => {
       }
     }
   }
+
+  // Verifica atualizações em segundo plano 5s após iniciar
+  setTimeout(async () => {
+    try {
+      const update = await checkForUpdates(app.getVersion());
+      if (update && mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.send('update-available', update);
+      }
+    } catch { /* silencioso */ }
+  }, 5000);
 });
 
 app.on('window-all-closed', () => {

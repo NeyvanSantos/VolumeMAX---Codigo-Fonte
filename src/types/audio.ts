@@ -32,6 +32,13 @@ export interface EngineStatus {
   engine: 'equalizer-apo';
 }
 
+export interface UpdateInfo {
+  version: string;
+  downloadUrl: string;
+  fileName: string;
+  releaseNotes: string;
+}
+
 export interface VolumeMaxAPI {
   getBoostLevel: () => Promise<number>;
   setBoostLevel: (level: number) => Promise<number>;
@@ -48,6 +55,10 @@ export interface VolumeMaxAPI {
   minimizeWindow: () => void;
   onBoostChanged: (callback: (level: number) => void) => () => void;
   onAudioMeter?: (callback: (data: { left: number; right: number; master: number; clipping: boolean }) => void) => () => void;
+  checkForUpdates?: () => Promise<UpdateInfo | null>;
+  downloadAndInstallUpdate?: (updateInfo: UpdateInfo) => Promise<{ success: boolean; error?: string }>;
+  onUpdateAvailable?: (callback: (info: UpdateInfo) => void) => () => void;
+  onUpdateDownloadProgress?: (callback: (percent: number) => void) => () => void;
 }
 
 declare global {

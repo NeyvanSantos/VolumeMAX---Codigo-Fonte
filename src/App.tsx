@@ -6,6 +6,7 @@ import QuickActions from './components/QuickActions';
 import AppVolumeList from './components/AppVolumeList';
 import HotkeyHint from './components/HotkeyHint';
 import SettingsPanel from './components/SettingsPanel';
+import UpdateBanner from './components/UpdateBanner';
 import type { AudioSession, AudioLevels, AudioProfile, EngineStatus } from './types/audio';
 
 const INITIAL_PROFILES: AudioProfile[] = [
@@ -259,6 +260,8 @@ function App() {
         onMinimizeToTrayChange={setMinimizeToTray}
         engineStatus={engineStatus}
       />
+
+      <UpdateBanner />
     </div>
   );
 }
