@@ -361,12 +361,16 @@ ipcMain.handle('download-and-install-update', async (_, updateInfo) => {
       }
     });
 
-    // Lança o instalador e encerra o VolumeMax para permitir a atualização
-    exec(`"${destPath}"`, { detached: true });
+    // Executa o instalador em modo silencioso (/S) e reabre o VolumeMax atualizado
+    const currentExe = process.execPath;
+    const updateCmd = `powershell -WindowStyle Hidden -Command "Start-Sleep -Seconds 1; Start-Process -FilePath '${destPath}' -ArgumentList '/S' -Wait; Start-Process -FilePath '${currentExe}'"`;
+
+    exec(updateCmd, { detached: true, windowsHide: true });
+
     setTimeout(() => {
       app.isQuitting = true;
       app.quit();
-    }, 1500);
+    }, 800);
 
     return { success: true };
   } catch (err) {

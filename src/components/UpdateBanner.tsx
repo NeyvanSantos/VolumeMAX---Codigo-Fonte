@@ -117,7 +117,7 @@ function UpdateBanner() {
         )}
         {state === 'done' && (
           <div style={{ fontSize: '12px', fontWeight: 700, color: '#4ade80' }}>
-            Atualização baixada! O instalador foi iniciado. O VolumeMax será encerrado…
+            Download concluído! Aplicando atualização e reiniciando o VolumeMax…
           </div>
         )}
         {state === 'error' && (
