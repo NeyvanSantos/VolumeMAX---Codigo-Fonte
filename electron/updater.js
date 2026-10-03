@@ -7,14 +7,25 @@ const GITHUB_OWNER = 'NeyvanSantos';
 const GITHUB_REPO = 'VolumeMAX---Codigo-Fonte';
 const GITHUB_API_URL = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/releases/latest`;
 
+function parseSemver(str) {
+  if (!str) return null;
+  const match = String(str).match(/(\d+)\.(\d+)\.(\d+)/);
+  if (!match) return null;
+  return [parseInt(match[1], 10), parseInt(match[2], 10), parseInt(match[3], 10)];
+}
+
 /**
  * Compara duas versões semânticas (ex: "2.0.0" vs "2.1.0").
  * @returns true se remoteVersion for mais nova que localVersion
  */
 function isNewerVersion(localVersion, remoteVersion) {
-  const toNum = (v) => v.replace(/^v/, '').split('.').map(Number);
-  const [lMaj, lMin, lPatch] = toNum(localVersion);
-  const [rMaj, rMin, rPatch] = toNum(remoteVersion);
+  const local = parseSemver(localVersion);
+  const remote = parseSemver(remoteVersion);
+
+  if (!local || !remote) return false;
+
+  const [lMaj, lMin, lPatch] = local;
+  const [rMaj, rMin, rPatch] = remote;
 
   if (rMaj !== lMaj) return rMaj > lMaj;
   if (rMin !== lMin) return rMin > lMin;
@@ -44,15 +55,18 @@ function checkForUpdates(currentVersion) {
       res.on('end', () => {
         try {
           const release = JSON.parse(data);
-          const remoteVersion = release.tag_name || release.name || '';
-
-          if (!remoteVersion) {
+          
+          // Extrai a versão seja da tag ou do nome do release (ex: "V.2.0.0", "v2.1.0")
+          const versionNumbers = parseSemver(release.tag_name) || parseSemver(release.name);
+          if (!versionNumbers) {
             return resolve(null);
           }
 
+          const remoteVersion = `${versionNumbers[0]}.${versionNumbers[1]}.${versionNumbers[2]}`;
+
           // Procura o asset de setup (.exe) para Windows x64
           const asset = (release.assets || []).find(
-            (a) => a.name && a.name.toLowerCase().includes('setup') && a.name.toLowerCase().endsWith('.exe')
+            (a) => a.name && (a.name.toLowerCase().includes('setup') || a.name.toLowerCase().endsWith('.exe'))
           );
 
           if (!asset) {
@@ -60,11 +74,11 @@ function checkForUpdates(currentVersion) {
           }
 
           if (!isNewerVersion(currentVersion, remoteVersion)) {
-            return resolve(null); // Já está na versão mais recente
+            return resolve(null); // Já está na versão mais recente ou igual
           }
 
           resolve({
-            version: remoteVersion,
+            version: `v${remoteVersion}`,
             downloadUrl: asset.browser_download_url,
             fileName: asset.name,
             releaseNotes: release.body || '',
