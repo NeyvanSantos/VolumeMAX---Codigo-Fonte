@@ -1,4 +1,4 @@
-const { app, BrowserWindow, Tray, Menu, screen, globalShortcut, ipcMain, nativeImage } = require('electron');
+const { app, BrowserWindow, Tray, Menu, screen, globalShortcut, ipcMain, nativeImage, shell } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const { exec, execFile } = require('child_process');
@@ -333,11 +333,20 @@ ipcMain.on('close-window', () => {
   mainWindow?.hide();
 });
 
+ipcMain.on('open-external', (_, url) => {
+  if (typeof url === 'string' && (url.startsWith('https://') || url.startsWith('http://'))) {
+    shell.openExternal(url);
+  }
+});
+
 // ── Auto-Update IPC Handlers ─────────────────────────────────────────────
 
 ipcMain.handle('check-for-updates', async () => {
   const currentVersion = app.getVersion();
   const update = await checkForUpdates(currentVersion);
+  if (update && mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send('update-available', update);
+  }
   return update; // null se já está na última versão
 });
 

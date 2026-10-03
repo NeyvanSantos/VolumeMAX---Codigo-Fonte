@@ -59,6 +59,7 @@ export interface VolumeMaxAPI {
   downloadAndInstallUpdate?: (updateInfo: UpdateInfo) => Promise<{ success: boolean; error?: string }>;
   onUpdateAvailable?: (callback: (info: UpdateInfo) => void) => () => void;
   onUpdateDownloadProgress?: (callback: (percent: number) => void) => () => void;
+  openExternal?: (url: string) => void;
 }
 
 declare global {

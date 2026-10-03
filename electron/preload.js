@@ -51,4 +51,7 @@ contextBridge.exposeInMainWorld('volumemax', {
     ipcRenderer.on('update-download-progress', handler);
     return () => ipcRenderer.removeListener('update-download-progress', handler);
   },
+
+  // Open external URL in default browser
+  openExternal: (url) => ipcRenderer.send('open-external', url),
 });
