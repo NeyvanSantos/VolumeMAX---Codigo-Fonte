@@ -10,6 +10,7 @@
 - **`installer/`:** Apenas scripts de instalação NSIS (`customInstaller.nsh`), instalador embutido (`EqualizerAPO-Installer.exe`) e termos legais (`terms.txt`).
 - **`assets/`:** Apenas imagens oficiais e ícones (`.ico`, `.png`). **Nunca** coloque instaladores ou executáveis aqui.
 - **`release/`:** Apenas os executáveis e instaladores gerados oficialmente.
+- **`scripts/`:** Apenas scripts utilitários de automação, publicação e CI/CD (ex: `publish-release.js`).
 - **`rules/`:** Apenas as regras exclusivas do projeto.
 - **Raiz do Projeto:** Deve conter exclusivamente os arquivos de configuração (`package.json`, `tsconfig.json`, `vite.config.ts`, `.gitignore`, `README.md`).
 

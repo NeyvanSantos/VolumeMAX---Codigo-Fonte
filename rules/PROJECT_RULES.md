@@ -26,6 +26,7 @@ Este documento consolida as regras fundamentais do projeto **VolumeMax**. Ele go
 * `installer/`: Scripts NSIS, termos e instalador embutido.
 * `assets/`: Apenas ícones e imagens. Proibido guardar instaladores aqui.
 * `release/`: Executáveis de distribuição.
+* `scripts/`: Scripts utilitários e de automação de releases.
 * `rules/`: Esta pasta de regras exclusivas do projeto.
 
 ---
