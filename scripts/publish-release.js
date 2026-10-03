@@ -120,9 +120,8 @@ function main() {
     console.log(`📌 Versão alvo: v${version}`);
   }
 
-  // 2. Verificar executáveis na pasta release/
+  // 2. Verificar instalador na pasta release/
   const setupExe = path.join(RELEASE_DIR, `VolumeMax Setup ${version}.exe`);
-  const portableExe = path.join(RELEASE_DIR, `VolumeMax ${version}.exe`);
 
   const shouldBuild = !fs.existsSync(setupExe) || process.argv.includes('--build');
 
@@ -195,9 +194,6 @@ function main() {
   console.log(`🌐 Publicando Release ${tag} no GitHub com notas e instalador anexado...`);
 
   const filesToUpload = [`"${setupExe}"`];
-  if (fs.existsSync(portableExe)) {
-    filesToUpload.push(`"${portableExe}"`);
-  }
 
   try {
     // Tenta criar release com arquivo de notas
